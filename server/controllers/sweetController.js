@@ -4,6 +4,7 @@ import { logger } from '../middleware/errorMiddleware.js';
 
 export const createSweet = async (req, res, next) => {
   try {
+    console.log('Creating sweet with data:', req.body);
     const sweetData = req.body;
     const sweet = new Sweet(sweetData);
     await sweet.save();
@@ -16,6 +17,7 @@ export const createSweet = async (req, res, next) => {
       sweet
     });
   } catch (error) {
+    console.error('Create sweet error:', error);
     logger.error('Create sweet error:', error);
     next(error);
   }

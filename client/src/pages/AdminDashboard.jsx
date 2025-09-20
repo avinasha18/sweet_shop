@@ -51,7 +51,11 @@ const AdminDashboard = () => {
       setSelectedSweet(null)
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to create sweet")
+      console.error('Create sweet error:', error);
+      const errorMessage = error.response?.data?.details?.join(', ') || 
+                          error.response?.data?.message || 
+                          "Failed to create sweet";
+      toast.error(errorMessage);
     },
   })
 
@@ -70,7 +74,11 @@ const AdminDashboard = () => {
       setSelectedSweet(null)
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to update sweet")
+      console.error('Update sweet error:', error);
+      const errorMessage = error.response?.data?.details?.join(', ') || 
+                          error.response?.data?.message || 
+                          "Failed to update sweet";
+      toast.error(errorMessage);
     },
   })
 

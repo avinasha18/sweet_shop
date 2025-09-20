@@ -137,3 +137,26 @@
 {"level":"info","message":"Wishlist retrieved for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T09:35:26.122Z"}
 {"level":"info","message":"Cart retrieved for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T09:35:26.133Z"}
 {"level":"info","message":"Sweets retrieved: 10 sweets, page 1","service":"sweet-shop-api","timestamp":"2025-09-20T09:36:15.287Z"}
+{"level":"info","message":"Server running in development mode on port 5000","service":"sweet-shop-api","timestamp":"2025-09-20T12:13:07.048Z"}
+{"ip":"::1","level":"error","message":"Not Found - /api/api/sweets","method":"GET","service":"sweet-shop-api","stack":"Error: Not Found - /api/api/sweets\n    at notFound (file:///C:/Users/91738/projects/incubyte-task/server/middleware/errorMiddleware.js:79:17)\n    at Layer.handle [as handle_request] (C:\\Users\\91738\\projects\\incubyte-task\\server\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\91738\\projects\\incubyte-task\\server\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\91738\\projects\\incubyte-task\\server\\node_modules\\express\\lib\\router\\index.js:286:9\n    at Function.process_params (C:\\Users\\91738\\projects\\incubyte-task\\server\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\91738\\projects\\incubyte-task\\server\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at urlencodedParser (C:\\Users\\91738\\projects\\incubyte-task\\server\\node_modules\\body-parser\\lib\\types\\urlencoded.js:94:7)\n    at Layer.handle [as handle_request] (C:\\Users\\91738\\projects\\incubyte-task\\server\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at trim_prefix (C:\\Users\\91738\\projects\\incubyte-task\\server\\node_modules\\express\\lib\\router\\index.js:328:13)\n    at C:\\Users\\91738\\projects\\incubyte-task\\server\\node_modules\\express\\lib\\router\\index.js:286:9","timestamp":"2025-09-20T12:13:09.452Z","url":"/api/api/sweets","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+{"level":"info","message":"Sweets retrieved: 10 sweets, page 1","service":"sweet-shop-api","timestamp":"2025-09-20T12:13:09.979Z"}
+{"level":"info","message":"Wishlist retrieved for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T12:13:09.987Z"}
+{"level":"info","message":"Cart retrieved for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T12:13:10.013Z"}
+{"level":"info","message":"Wishlist retrieved for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T12:13:10.032Z"}
+{"level":"info","message":"Cart retrieved for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T12:13:10.047Z"}
+{"level":"info","message":"Sweets retrieved: 10 sweets, page 1","service":"sweet-shop-api","timestamp":"2025-09-20T13:13:29.105Z"}
+{"level":"info","message":"Token refreshed for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T13:13:29.728Z"}
+{"level":"info","message":"Token refreshed for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T13:13:29.733Z"}
+{"level":"info","message":"Token refreshed for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T13:13:29.737Z"}
+{"level":"info","message":"Token refreshed for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T13:13:29.742Z"}
+{"level":"info","message":"Wishlist retrieved for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T13:13:29.844Z"}
+{"level":"info","message":"Cart retrieved for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T13:13:29.853Z"}
+{"level":"info","message":"Wishlist retrieved for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T13:13:29.862Z"}
+{"level":"info","message":"Cart retrieved for user: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T13:13:29.870Z"}
+{"level":"info","message":"User logged in: admin@sweetshop.com","service":"sweet-shop-api","timestamp":"2025-09-20T13:14:04.768Z"}
+{"level":"info","message":"Sweets retrieved: 10 sweets, page 1","service":"sweet-shop-api","timestamp":"2025-09-20T13:14:04.820Z"}
+{"level":"info","message":"Sweets retrieved: 10 sweets, page 1","service":"sweet-shop-api","timestamp":"2025-09-20T13:14:09.503Z"}
+{"level":"info","message":"Sweets retrieved: 10 sweets, page 1","service":"sweet-shop-api","timestamp":"2025-09-20T13:16:27.203Z"}
+{"level":"info","message":"Sweets retrieved: 10 sweets, page 1","service":"sweet-shop-api","timestamp":"2025-09-20T13:16:41.474Z"}
+{"level":"info","message":"Sweets retrieved: 10 sweets, page 1","service":"sweet-shop-api","timestamp":"2025-09-20T13:16:59.421Z"}
+{"level":"info","message":"Sweets retrieved: 10 sweets, page 1","service":"sweet-shop-api","timestamp":"2025-09-20T13:24:31.454Z"}

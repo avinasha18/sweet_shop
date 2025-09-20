@@ -48,15 +48,16 @@ export const sweetSchema = Joi.object({
     'number.min': 'Price cannot be negative',
     'any.required': 'Price is required'
   }),
-  quantity: Joi.number().min(0).default(0).messages({
-    'number.min': 'Quantity cannot be negative'
+  quantity: Joi.number().min(0).required().messages({
+    'number.min': 'Quantity cannot be negative',
+    'any.required': 'Quantity is required'
   }),
   description: Joi.string().min(10).max(500).required().messages({
     'string.min': 'Description must be at least 10 characters long',
     'string.max': 'Description cannot exceed 500 characters',
     'any.required': 'Description is required'
   }),
-  imageUrl: Joi.string().uri().optional().messages({
+  imageUrl: Joi.string().uri().allow('').optional().messages({
     'string.uri': 'Image URL must be a valid URL'
   })
 });

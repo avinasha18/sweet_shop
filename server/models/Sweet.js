@@ -35,7 +35,12 @@ const sweetSchema = new mongoose.Schema({
   imageUrl: {
     type: String,
     trim: true,
-    match: [/^https?:\/\/.+/, 'Image URL must be a valid HTTP/HTTPS URL']
+    validate: {
+      validator: function(v) {
+        return !v || /^https?:\/\/.+/.test(v);
+      },
+      message: 'Image URL must be a valid HTTP/HTTPS URL'
+    }
   }
 }, {
   timestamps: true

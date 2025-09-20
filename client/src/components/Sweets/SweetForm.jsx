@@ -62,7 +62,7 @@ const SweetForm = ({ sweet, onSubmit, onCancel, isLoading }) => {
       newErrors.description = "Description must be at least 10 characters"
     }
 
-    if (formData.imageUrl && !formData.imageUrl.match(/^https?:\/\/.+/)) {
+    if (formData.imageUrl.trim() && !formData.imageUrl.match(/^https?:\/\/.+/)) {
       newErrors.imageUrl = "Image URL must be a valid HTTP/HTTPS URL"
     }
 
@@ -78,7 +78,16 @@ const SweetForm = ({ sweet, onSubmit, onCancel, isLoading }) => {
       ...formData,
       price: Number.parseFloat(formData.price),
       quantity: Number.parseInt(formData.quantity),
+      // Remove imageUrl if it's empty
+      ...(formData.imageUrl.trim() && { imageUrl: formData.imageUrl.trim() })
     }
+    
+    // Remove empty imageUrl from the data
+    if (!submitData.imageUrl) {
+      delete submitData.imageUrl;
+    }
+
+    console.log('Submitting sweet data:', submitData);
 
     onSubmit(submitData)
   }
