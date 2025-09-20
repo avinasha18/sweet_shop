@@ -25,10 +25,11 @@ axiosInstance.interceptors.request.use(
   },
 )
 
-// Response interceptor for error handling
+// Response interceptor for error handling and token refresh
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config
     const message = error.response?.data?.message || "Something went wrong"
     const url = error.config?.url || ""
 
@@ -37,8 +38,38 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      try {
+        const refreshToken = localStorage.getItem("refreshToken")
+        if (refreshToken) {
+          const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+            refreshToken: refreshToken,
+          })
+
+          const { accessToken } = response.data
+          localStorage.setItem("token", accessToken)
+
+          // Retry the original request with new token
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`
+          return axiosInstance(originalRequest)
+        }
+      } catch (refreshError) {
+        // Refresh failed, redirect to login
+        localStorage.removeItem("token")
+        localStorage.removeItem("refreshToken")
+        localStorage.removeItem("user")
+        
+        // Only show toast if not already on login page
+        if (window.location.pathname !== "/login") {
+          toast.error("Session expired. Please login again.")
+          window.location.href = "/login"
+        }
+      }
+    } else if (error.response?.status === 401) {
       localStorage.removeItem("token")
+      localStorage.removeItem("refreshToken")
       localStorage.removeItem("user")
       window.location.href = "/login"
       toast.error("Session expired. Please login again.")

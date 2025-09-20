@@ -22,6 +22,7 @@ const router = express.Router();
 
 // Public routes
 router.get('/', validateQuery(sweetsQuerySchema), getSweets);
+router.get('/search', validateQuery(sweetsQuerySchema), getSweets); // Dedicated search endpoint
 router.get('/:id', getSweetById);
 
 // Protected routes (require authentication)

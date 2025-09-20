@@ -51,9 +51,10 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token")
+    const refreshToken = localStorage.getItem("refreshToken")
     const user = localStorage.getItem("user")
 
-    if (token && user) {
+    if (token && refreshToken && user) {
       try {
         const parsedUser = JSON.parse(user)
         dispatch({
@@ -62,6 +63,7 @@ export const AuthProvider = ({ children }) => {
         })
       } catch (error) {
         localStorage.removeItem("token")
+        localStorage.removeItem("refreshToken")
         localStorage.removeItem("user")
       }
     }
@@ -76,9 +78,10 @@ export const AuthProvider = ({ children }) => {
 
       console.log("Login response:", response.data) // Debug log
 
-      const { accessToken, user } = response.data
+      const { accessToken, refreshToken, user } = response.data
 
       localStorage.setItem("token", accessToken)
+      localStorage.setItem("refreshToken", refreshToken)
       localStorage.setItem("user", JSON.stringify(user))
 
       dispatch({
@@ -100,9 +103,10 @@ export const AuthProvider = ({ children }) => {
       dispatch({ type: "SET_LOADING", payload: true })
       const response = await axiosInstance.post("/auth/register", { name, email, password })
 
-      const { accessToken, user } = response.data
+      const { accessToken, refreshToken, user } = response.data
 
       localStorage.setItem("token", accessToken)
+      localStorage.setItem("refreshToken", refreshToken)
       localStorage.setItem("user", JSON.stringify(user))
 
       dispatch({
@@ -120,6 +124,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("token")
+    localStorage.removeItem("refreshToken")
     localStorage.removeItem("user")
     dispatch({ type: "LOGOUT" })
     toast.success("Logged out successfully")

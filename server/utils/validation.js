@@ -86,6 +86,17 @@ export const restockSchema = Joi.object({
   })
 });
 
+// Cart validation schemas
+export const cartItemSchema = Joi.object({
+  sweetId: Joi.string().required(),
+  quantity: Joi.number().min(1).required()
+});
+
+export const cartUpdateSchema = Joi.object({
+  sweetId: Joi.string().required(),
+  quantity: Joi.number().min(0).required()
+});
+
 // Query validation schemas
 export const sweetsQuerySchema = Joi.object({
   page: Joi.number().min(1).default(1),

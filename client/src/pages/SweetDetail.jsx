@@ -9,6 +9,8 @@ import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid"
 import axiosInstance from "../api/axiosInstance.js"
 import { formatPrice, getStockStatus } from "../utils/helpers.js"
 import Loader from "../components/Shared/Loader.jsx"
+import { useWishlist } from "../context/WishlistContext.jsx"
+import { useAuth } from "../context/AuthContext.jsx"
 import toast from "react-hot-toast"
 
 const SweetDetail = () => {
@@ -16,7 +18,8 @@ const SweetDetail = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [quantity, setQuantity] = useState(1)
-  const [isFavorite, setIsFavorite] = useState(false)
+  const { isInWishlist, toggleWishlistItem, isLoading: wishlistLoading } = useWishlist()
+  const { isAuthenticated } = useAuth()
 
   const {
     data: apiResponse,
@@ -157,12 +160,13 @@ const SweetDetail = () => {
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{sweet.name}</h1>
                 <div className="flex items-center space-x-2">
                   <motion.button
-                    onClick={() => setIsFavorite(!isFavorite)}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                    onClick={handleFavoriteToggle}
+                    disabled={wishlistLoading}
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors disabled:opacity-50"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
-                    {isFavorite ? (
+                    {isInWishlist(id) ? (
                       <HeartSolidIcon className="w-6 h-6 text-red-500" />
                     ) : (
                       <HeartIcon className="w-6 h-6 text-gray-600 dark:text-gray-400" />

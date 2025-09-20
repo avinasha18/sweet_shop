@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import { authRoutes } from './routes/authRoutes.js';
 import { sweetRoutes } from './routes/sweetRoutes.js';
+import { cartRoutes } from './routes/cartRoutes.js';
+import { wishlistRoutes } from './routes/wishlistRoutes.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 import { logger } from './middleware/errorMiddleware.js';
 
@@ -66,6 +68,8 @@ app.get('/healthz', (req, res) => {
 // API routes
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/sweets', sweetRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // 404 handler
 app.use(notFound);

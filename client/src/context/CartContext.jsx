@@ -1,6 +1,8 @@
 "use client"
 
 import { createContext, useContext, useReducer, useEffect } from "react"
+import axiosInstance from "../api/axiosInstance.js"
+import toast from "react-hot-toast"
 
 const CartContext = createContext()
 
@@ -9,64 +11,60 @@ const initialState = {
   totalItems: 0,
   totalPrice: 0,
   isOpen: false,
+  isLoading: false,
 }
 
 const cartReducer = (state, action) => {
   switch (action.type) {
-    case "ADD_TO_CART":
-      const existingItem = state.items.find(item => item.sweet._id === action.payload.sweet._id)
-      
-      if (existingItem) {
-        const updatedItems = state.items.map(item =>
-          item.sweet._id === action.payload.sweet._id
-            ? { ...item, quantity: item.quantity + action.payload.quantity }
-            : item
-        )
-        return {
-          ...state,
-          items: updatedItems,
-          totalItems: updatedItems.reduce((sum, item) => sum + item.quantity, 0),
-          totalPrice: updatedItems.reduce((sum, item) => sum + (item.sweet.price * item.quantity), 0),
-        }
-      } else {
-        const newItems = [...state.items, action.payload]
-        return {
-          ...state,
-          items: newItems,
-          totalItems: newItems.reduce((sum, item) => sum + item.quantity, 0),
-          totalPrice: newItems.reduce((sum, item) => sum + (item.sweet.price * item.quantity), 0),
-        }
-      }
-
-    case "REMOVE_FROM_CART":
-      const filteredItems = state.items.filter(item => item.sweet._id !== action.payload)
+    case "SET_LOADING":
       return {
         ...state,
-        items: filteredItems,
-        totalItems: filteredItems.reduce((sum, item) => sum + item.quantity, 0),
-        totalPrice: filteredItems.reduce((sum, item) => sum + (item.sweet.price * item.quantity), 0),
+        isLoading: action.payload,
       }
 
-    case "UPDATE_QUANTITY":
-      const updatedItems = state.items.map(item =>
-        item.sweet._id === action.payload.sweetId
-          ? { ...item, quantity: action.payload.quantity }
-          : item
-      ).filter(item => item.quantity > 0)
-      
+    case "SET_CART":
       return {
         ...state,
-        items: updatedItems,
-        totalItems: updatedItems.reduce((sum, item) => sum + item.quantity, 0),
-        totalPrice: updatedItems.reduce((sum, item) => sum + (item.sweet.price * item.quantity), 0),
+        items: action.payload.items || [],
+        totalItems: action.payload.totalItems || 0,
+        totalPrice: action.payload.totalPrice || 0,
+        isLoading: false,
       }
 
-    case "CLEAR_CART":
+    case "ADD_TO_CART_SUCCESS":
+      return {
+        ...state,
+        items: action.payload.items || [],
+        totalItems: action.payload.totalItems || 0,
+        totalPrice: action.payload.totalPrice || 0,
+        isLoading: false,
+      }
+
+    case "UPDATE_CART_SUCCESS":
+      return {
+        ...state,
+        items: action.payload.items || [],
+        totalItems: action.payload.totalItems || 0,
+        totalPrice: action.payload.totalPrice || 0,
+        isLoading: false,
+      }
+
+    case "REMOVE_FROM_CART_SUCCESS":
+      return {
+        ...state,
+        items: action.payload.items || [],
+        totalItems: action.payload.totalItems || 0,
+        totalPrice: action.payload.totalPrice || 0,
+        isLoading: false,
+      }
+
+    case "CLEAR_CART_SUCCESS":
       return {
         ...state,
         items: [],
         totalItems: 0,
         totalPrice: 0,
+        isLoading: false,
       }
 
     case "TOGGLE_CART":
@@ -81,12 +79,10 @@ const cartReducer = (state, action) => {
         isOpen: action.payload,
       }
 
-    case "LOAD_CART":
+    case "CART_ERROR":
       return {
         ...state,
-        items: action.payload.items || [],
-        totalItems: action.payload.totalItems || 0,
-        totalPrice: action.payload.totalPrice || 0,
+        isLoading: false,
       }
 
     default:
@@ -97,51 +93,142 @@ const cartReducer = (state, action) => {
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState)
 
-  // Load cart from localStorage on mount
+  // Load cart from server on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem("cart")
-    if (savedCart) {
+    const loadCartData = async () => {
       try {
-        const cartData = JSON.parse(savedCart)
-        dispatch({ type: "LOAD_CART", payload: cartData })
+        dispatch({ type: "SET_LOADING", payload: true })
+        const response = await axiosInstance.get("/cart")
+        dispatch({ type: "SET_CART", payload: response.data.cart })
       } catch (error) {
-        console.error("Error loading cart from localStorage:", error)
+        console.error("Error loading cart:", error)
+        dispatch({ type: "CART_ERROR" })
+        // Don't show error toast for initial load failure
+        if (error.response?.status !== 401) {
+          toast.error("Failed to load cart")
+        }
       }
     }
+    
+    loadCartData()
   }, [])
 
-  // Save cart to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify({
-      items: state.items,
-      totalItems: state.totalItems,
-      totalPrice: state.totalPrice,
-    }))
-  }, [state.items, state.totalItems, state.totalPrice])
-
-  const addToCart = (sweet, quantity = 1) => {
-    dispatch({
-      type: "ADD_TO_CART",
-      payload: { sweet, quantity }
-    })
+  const loadCart = async () => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true })
+      const response = await axiosInstance.get("/cart")
+      dispatch({ type: "SET_CART", payload: response.data.cart })
+    } catch (error) {
+      console.error("Error loading cart:", error)
+      dispatch({ type: "CART_ERROR" })
+    }
   }
 
-  const removeFromCart = (sweetId) => {
-    dispatch({
-      type: "REMOVE_FROM_CART",
-      payload: sweetId
-    })
+  const addToCart = async (sweet, quantity = 1) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true })
+      
+      // Validate stock before adding
+      if (sweet.quantity < quantity) {
+        toast.error(`Insufficient stock. Only ${sweet.quantity} items available.`)
+        dispatch({ type: "CART_ERROR" })
+        return
+      }
+      
+      const response = await axiosInstance.post("/cart/add", {
+        sweetId: sweet._id,
+        quantity: quantity
+      })
+      
+      dispatch({ type: "ADD_TO_CART_SUCCESS", payload: response.data.cart })
+      toast.success(response.data.message)
+    } catch (error) {
+      dispatch({ type: "CART_ERROR" })
+      const errorMessage = error.response?.data?.message || "Failed to add to cart"
+      toast.error(errorMessage)
+      
+      // If stock issue, reload cart to sync with server
+      if (error.response?.status === 400 && errorMessage.includes("stock")) {
+        loadCart()
+      }
+    }
   }
 
-  const updateQuantity = (sweetId, quantity) => {
-    dispatch({
-      type: "UPDATE_QUANTITY",
-      payload: { sweetId, quantity }
-    })
+  const updateQuantity = async (sweetId, quantity) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true })
+      
+      // Validate quantity
+      if (quantity < 0) {
+        toast.error("Quantity cannot be negative")
+        dispatch({ type: "CART_ERROR" })
+        return
+      }
+      
+      const response = await axiosInstance.put("/cart/update", {
+        sweetId: sweetId,
+        quantity: quantity
+      })
+      
+      dispatch({ type: "UPDATE_CART_SUCCESS", payload: response.data.cart })
+    } catch (error) {
+      dispatch({ type: "CART_ERROR" })
+      const errorMessage = error.response?.data?.message || "Failed to update cart"
+      toast.error(errorMessage)
+      
+      // If stock issue, reload cart to sync with server
+      if (error.response?.status === 400 && errorMessage.includes("stock")) {
+        loadCart()
+      }
+    }
   }
 
-  const clearCart = () => {
-    dispatch({ type: "CLEAR_CART" })
+  const removeFromCart = async (sweetId) => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true })
+      const response = await axiosInstance.delete(`/cart/item/${sweetId}`)
+      
+      dispatch({ type: "REMOVE_FROM_CART_SUCCESS", payload: response.data.cart })
+      toast.success(response.data.message)
+    } catch (error) {
+      dispatch({ type: "CART_ERROR" })
+      toast.error(error.response?.data?.message || "Failed to remove from cart")
+    }
+  }
+
+  const clearCart = async () => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true })
+      const response = await axiosInstance.delete("/cart/clear")
+      
+      dispatch({ type: "CLEAR_CART_SUCCESS", payload: response.data.cart })
+      toast.success(response.data.message)
+    } catch (error) {
+      dispatch({ type: "CART_ERROR" })
+      toast.error(error.response?.data?.message || "Failed to clear cart")
+    }
+  }
+
+  const purchaseCart = async () => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true })
+      const response = await axiosInstance.post("/cart/purchase")
+      
+      dispatch({ type: "CLEAR_CART_SUCCESS", payload: response.data })
+      toast.success(response.data.message)
+      return { success: true, orders: response.data.orders }
+    } catch (error) {
+      dispatch({ type: "CART_ERROR" })
+      const errorMessage = error.response?.data?.message || "Purchase failed"
+      toast.error(errorMessage)
+      
+      // If stock issues, reload cart to sync with server
+      if (error.response?.status === 400 && errorMessage.includes("stock")) {
+        loadCart()
+      }
+      
+      return { success: false, error: error.response?.data }
+    }
   }
 
   const toggleCart = () => {
@@ -153,12 +240,12 @@ export const CartProvider = ({ children }) => {
   }
 
   const getItemQuantity = (sweetId) => {
-    const item = state.items.find(item => item.sweet._id === sweetId)
+    const item = state.items.find(item => item.sweetId._id === sweetId)
     return item ? item.quantity : 0
   }
 
   const isInCart = (sweetId) => {
-    return state.items.some(item => item.sweet._id === sweetId)
+    return state.items.some(item => item.sweetId._id === sweetId)
   }
 
   const value = {
@@ -167,10 +254,12 @@ export const CartProvider = ({ children }) => {
     removeFromCart,
     updateQuantity,
     clearCart,
+    purchaseCart,
     toggleCart,
     setCartOpen,
     getItemQuantity,
     isInCart,
+    loadCart,
   }
 
   return (

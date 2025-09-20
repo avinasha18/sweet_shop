@@ -18,29 +18,26 @@ const Cart = () => {
     toggleCart, 
     updateQuantity, 
     removeFromCart, 
-    clearCart 
+    clearCart,
+    purchaseCart
   } = useCart()
   
   const { isAuthenticated } = useAuth()
   const queryClient = useQueryClient()
 
   const purchaseMutation = useMutation({
-    mutationFn: async (cartItems) => {
-      const promises = cartItems.map(item =>
-        axiosInstance.post(`/sweets/${item.sweet._id}/purchase`, { 
-          quantity: item.quantity 
-        })
-      )
-      return Promise.all(promises)
+    mutationFn: async () => {
+      return await purchaseCart()
     },
-    onSuccess: () => {
-      toast.success("Purchase completed successfully!")
-      clearCart()
-      toggleCart()
-      queryClient.invalidateQueries(["sweets"])
+    onSuccess: (result) => {
+      if (result.success) {
+        toast.success("Purchase completed successfully!")
+        toggleCart()
+        queryClient.invalidateQueries(["sweets"])
+      }
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Purchase failed")
+      toast.error(error.message || "Purchase failed")
     },
   })
 
@@ -58,11 +55,11 @@ const Cart = () => {
     purchaseMutation.mutate(items)
   }
 
-  const handleQuantityChange = (sweetId, newQuantity) => {
+  const handleQuantityChange = async (sweetId, newQuantity) => {
     if (newQuantity <= 0) {
-      removeFromCart(sweetId)
+      await removeFromCart(sweetId)
     } else {
-      updateQuantity(sweetId, newQuantity)
+      await updateQuantity(sweetId, newQuantity)
     }
   }
 
@@ -119,7 +116,7 @@ const Cart = () => {
                 <div className="space-y-4">
                   {items.map((item) => (
                     <motion.div
-                      key={item.sweet._id}
+                      key={item.sweetId._id}
                       className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -127,21 +124,21 @@ const Cart = () => {
                     >
                       <div className="flex items-start space-x-3">
                         <img
-                          src={item.sweet.imageUrl || "/api/placeholder/80/80"}
-                          alt={item.sweet.name}
+                          src={item.sweetId.imageUrl || "/api/placeholder/80/80"}
+                          alt={item.sweetId.name}
                           className="w-16 h-16 rounded-lg object-cover"
                         />
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium text-gray-900 dark:text-white truncate">
-                            {item.sweet.name}
+                            {item.sweetId.name}
                           </h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {formatPrice(item.sweet.price)} each
+                            {formatPrice(item.priceAtAdd)} each
                           </p>
                           <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center space-x-2">
                               <button
-                                onClick={() => handleQuantityChange(item.sweet._id, item.quantity - 1)}
+                                onClick={() => handleQuantityChange(item.sweetId._id, item.quantity - 1)}
                                 className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
                               >
                                 <MinusIcon className="w-4 h-4 text-gray-500" />
@@ -150,7 +147,7 @@ const Cart = () => {
                                 {item.quantity}
                               </span>
                               <button
-                                onClick={() => handleQuantityChange(item.sweet._id, item.quantity + 1)}
+                                onClick={() => handleQuantityChange(item.sweetId._id, item.quantity + 1)}
                                 className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
                               >
                                 <PlusIcon className="w-4 h-4 text-gray-500" />
@@ -158,10 +155,10 @@ const Cart = () => {
                             </div>
                             <div className="flex items-center space-x-2">
                               <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                {formatPrice(item.sweet.price * item.quantity)}
+                                {formatPrice(item.priceAtAdd * item.quantity)}
                               </span>
                               <button
-                                onClick={() => removeFromCart(item.sweet._id)}
+                                onClick={() => removeFromCart(item.sweetId._id)}
                                 className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded-full transition-colors"
                               >
                                 <TrashIcon className="w-4 h-4 text-red-500" />

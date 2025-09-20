@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Sweet from '../models/Sweet.js';
 import { logger } from '../middleware/errorMiddleware.js';
 
@@ -190,7 +191,7 @@ export const purchaseSweet = async (req, res, next) => {
       },
       { 
         new: true, 
-        runValidators: true 
+        runValidators: true
       }
     );
 
@@ -233,7 +234,6 @@ export const purchaseSweet = async (req, res, next) => {
       sweet: sweet,
       order
     });
-
   } catch (error) {
     logger.error('Purchase sweet error:', error);
     next(error);

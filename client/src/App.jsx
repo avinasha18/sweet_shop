@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Toaster } from "react-hot-toast"
 import { AuthProvider } from "./context/AuthContext.jsx"
 import { CartProvider } from "./context/CartContext.jsx"
+import { WishlistProvider } from "./context/WishlistContext.jsx"
 import Navbar from "./components/Navbar.jsx"
 import Footer from "./components/Layout/Footer.jsx"
 import Cart from "./components/Cart/Cart.jsx"
@@ -32,7 +33,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CartProvider>
-          <Router>
+          <WishlistProvider>
+            <Router>
             <div className="min-h-screen bg-gray-50 flex flex-col">
               <Navbar />
               <main className="flex-1">
@@ -96,9 +98,10 @@ function App() {
               />
             </div>
           </Router>
-        </CartProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+        </WishlistProvider>
+      </CartProvider>
+    </AuthProvider>
+  </QueryClientProvider>
   )
 }
 

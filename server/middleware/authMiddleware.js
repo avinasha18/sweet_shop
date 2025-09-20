@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { logger } from './errorMiddleware.js';
 
 export const authenticateToken = async (req, res, next) => {
   try {
@@ -46,7 +47,15 @@ export const authenticateToken = async (req, res, next) => {
 };
 
 export const requireAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: 'Authentication required'
+    });
+  }
+  
   if (req.user.role !== 'admin') {
+    logger.warn(`Unauthorized admin access attempt by user: ${req.user.email} (role: ${req.user.role})`);
     return res.status(403).json({
       success: false,
       message: 'Admin access required'

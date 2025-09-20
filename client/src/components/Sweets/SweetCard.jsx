@@ -5,17 +5,26 @@ import { motion } from "framer-motion"
 import { HeartIcon } from "@heroicons/react/24/outline"
 import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid"
 import { formatPrice, getStockStatus } from "../../utils/helpers.js"
-import { useState } from "react"
+import { useWishlist } from "../../context/WishlistContext.jsx"
+import { useAuth } from "../../context/AuthContext.jsx"
 import PurchaseButton from "../Inventory/PurchaseButton.jsx"
+import toast from "react-hot-toast"
 
 const SweetCard = ({ sweet }) => {
-  const [isFavorite, setIsFavorite] = useState(false)
+  const { isInWishlist, toggleWishlistItem, isLoading } = useWishlist()
+  const { isAuthenticated } = useAuth()
   const stockStatus = getStockStatus(sweet.quantity)
 
   const handleFavoriteToggle = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    setIsFavorite(!isFavorite)
+    
+    if (!isAuthenticated) {
+      toast.error("Please login to manage your wishlist")
+      return
+    }
+    
+    toggleWishlistItem(sweet._id)
   }
 
   const handleAddToCart = (e) => {
@@ -56,11 +65,12 @@ const SweetCard = ({ sweet }) => {
           {/* Favorite Button */}
           <motion.button
             onClick={handleFavoriteToggle}
-            className="absolute top-3 right-3 p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            disabled={isLoading}
+            className="absolute top-3 right-3 p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 disabled:opacity-50"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            {isFavorite ? (
+            {isInWishlist(sweet._id) ? (
               <HeartSolidIcon className="w-5 h-5 text-red-500" />
             ) : (
               <HeartIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
