@@ -1,0 +1,36 @@
+{
+  "name": "sweet-shop-management-system",
+  "version": "1.0.0",
+  "description": "A production-ready Sweet Shop Management System using the MERN stack",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd client && npm run dev",
+    "server:install": "cd server && npm install",
+    "client:install": "cd client && npm install",
+    "install:all": "npm run server:install && npm run client:install",
+    "server:test": "cd server && npm test",
+    "client:test": "cd client && npm test",
+    "test:all": "npm run server:test && npm run client:test",
+    "server:seed": "cd server && npm run seed",
+    "docker:dev": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "mern",
+    "react",
+    "nodejs",
+    "mongodb",
+    "express",
+    "jwt",
+    "authentication",
+    "ecommerce",
+    "sweet-shop"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
